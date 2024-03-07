@@ -1,0 +1,45 @@
+#include <WiFi.h>
+#include <PubSubClient.h>
+
+// ข้อมูลเครือข่าย WiFi
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+// ข้อมูล NETPIE
+const char* mqttBroker = "MQTT_BROKER_ADDRESS";
+const char* mqttClientId = "CLIENT_ID";
+const char* mqttUsername = "TOKEN";
+const char* mqttPassword = "SECRET";
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup() {
+  Serial.begin(115200);
+
+  // เชื่อมต่อ WiFi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.println("Connecting to WiFi..");
+  }
+  Serial.println("Connected to the WiFi network");
+
+  // เชื่อมต่อ MQTT Broker
+  client.setServer(mqttBroker, 1883);
+  while (!client.connected()) {
+    Serial.println("Connecting to MQTT...");
+
+    if (client.connect(mqttClientId, mqttUsername, mqttPassword)) {
+      Serial.println("Connected to MQTT Broker!");
+    } else {
+      Serial.print("Failed with state ");
+      Serial.print(client.state());
+      delay(2000);
+    }
+  }
+}
+
+void loop() {
+  // ใส่โค้ดสำหรับการสื่อสาร MQTT ที่นี่
+}
