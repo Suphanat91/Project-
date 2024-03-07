@@ -1,0 +1,75 @@
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <DHT.h>
+
+// ข้อมูลเครือข่าย WiFi
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+// ข้อมูล NETPIE
+const char* mqttBroker = "MQTT_BROKER_ADDRESS";
+const char* mqttClientId = "CLIENT_ID";
+const char* mqttUsername = "TOKEN";
+const char* mqttPassword = "SECRET";
+
+// ข้อมูลเซ็นเซอร์ DHT
+#define DHTPIN 4     // พินที่เชื่อมต่อกับ DHT sensor
+#define DHTTYPE DHT22   // DHT 22  (AM2302), DHT11 ใช้ค่า DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+
+  // เชื่อมต่อ WiFi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.println("Connecting to WiFi..");
+  }
+  Serial.println("Connected to the WiFi network");
+
+  // เชื่อมต่อ MQTT Broker
+  client.setServer(mqttBroker, 1883);
+  while (!client.connected()) {
+    Serial.println("Connecting to MQTT...");
+
+    if (client.connect(mqttClientId, mqttUsername, mqttPassword)) {
+      Serial.println("Connected to MQTT Broker!");
+    } else {
+      Serial.print("Failed with state ");
+      Serial.print(client.state());
+      delay(2000);
+    }
+  }
+}
+
+void loop() {
+  // อ่านค่าจากเซ็นเซอร์ DHT
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+
+  // ตรวจสอบว่าอ่านค่าสำเร็จหรือไม่
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  Serial.print("Humidity: ");
+  Serial.print(h);
+  Serial.print(" %\t");
+  Serial.print("Temperature: ");
+  Serial.print(t);
+  Serial.println(" *C ");
+
+  // สร้างสตริงข้อมูล JSON
+  String payload = "{\"temperature\": " + String(t) + ", \"humidity\": " + String(h) + "}";
+
+  // ส่งข้อมูลไปยัง NETPIE
+  client.publish("YOUR_TOPIC", payload.c_str());
+
+  delay(2000); // รอ 2 วินาทีก่อนการอ่านค่าถัดไป
+}
