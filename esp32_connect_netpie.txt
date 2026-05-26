@@ -1,11 +1,11 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-// ข้อมูลเครือข่าย WiFi
+// Wi-Fi network settings
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
 
-// ข้อมูล NETPIE
+// NETPIE settings
 const char* mqttBroker = "MQTT_BROKER_ADDRESS";
 const char* mqttClientId = "CLIENT_ID";
 const char* mqttUsername = "TOKEN";
@@ -17,7 +17,7 @@ PubSubClient client(espClient);
 void setup() {
   Serial.begin(115200);
 
-  // เชื่อมต่อ WiFi
+  // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -25,7 +25,7 @@ void setup() {
   }
   Serial.println("Connected to the WiFi network");
 
-  // เชื่อมต่อ MQTT Broker
+  // Connect to the MQTT broker
   client.setServer(mqttBroker, 1883);
   while (!client.connected()) {
     Serial.println("Connecting to MQTT...");
@@ -41,5 +41,5 @@ void setup() {
 }
 
 void loop() {
-  // ใส่โค้ดสำหรับการสื่อสาร MQTT ที่นี่
+  // Add MQTT communication code here
 }
