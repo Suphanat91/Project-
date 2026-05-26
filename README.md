@@ -74,4 +74,4 @@ Also verify these settings:
 
 These examples use Arduino and ESP32 libraries and classes, which are C++-based rather than plain C.
 
-Because of that, `.ino` or `.cpp` is a better fit than `.c`.
+Because of that, `.ino` or `.cpp` is a better fit than `.c`.  
